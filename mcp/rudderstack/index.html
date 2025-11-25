@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RudderStack MCP Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #ffffff;
+            color: #000000;
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+        
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            stroke: #000000;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #000000;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+        }
+        
+        .icon {
+            width: 24px;
+            height: 24px;
+            stroke: #000000;
+            stroke-width: 2;
+            fill: none;
+            flex-shrink: 0;
+        }
+        
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .use-case-card {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .use-case-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .use-case-card h3 {
+            color: #000000;
+            margin-bottom: 16px;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .use-case-icon {
+            width: 20px;
+            height: 20px;
+            stroke: #000000;
+            stroke-width: 2;
+            fill: none;
+            flex-shrink: 0;
+        }
+        
+        .use-case-card ul {
+            list-style: none;
+        }
+        
+        .use-case-card li {
+            padding: 8px 0;
+            color: #000000;
+            line-height: 1.5;
+        }
+        
+        .use-case-card li {
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .use-case-card li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #000000;
+            font-weight: bold;
+        }
+        
+        .use-case-chat {
+            margin-bottom: 12px;
+            font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+            font-size: 0.9em;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .use-case-chat svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+        }
+        
+        .setup-steps {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 20px;
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .setup-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            height: 2px;
+            background: #000000;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        
+        .step {
+            background: #f9fafb;
+            padding: 30px 25px;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            flex: 1 1 0;
+            min-width: 0;
+            z-index: 1;
+        }
+        
+        .step-number {
+            background: #000000;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin: 0 auto 20px;
+        }
+        
+        .step h3 {
+            color: #000000;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .step p {
+            color: #000000;
+            line-height: 1.6;
+            opacity: 0.7;
+        }
+        
+        .code-block {
+            background: #f9fafb;
+            color: #000000;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            overflow-x: auto;
+            margin-top: 30px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+            position: relative;
+        }
+        
+        .code-block::before {
+            content: 'JSON';
+            position: absolute;
+            top: -2px;
+            left: 15px;
+            background: #ffffff;
+            padding: 2px 8px;
+            font-size: 0.75em;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: #000000;
+            opacity: 0.6;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            font: inherit;
+            background: transparent;
+            color: inherit;
+        }
+        
+        .code-copy-button {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.9);
+            border-color: rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .code-block .copy-feedback {
+            position: absolute;
+            top: 14px;
+            right: 62px;
+            color: #000000;
+        }
+        
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .capability {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .capability:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .capability h4 {
+            color: #000000;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .capability-icon {
+            width: 18px;
+            height: 18px;
+            stroke: #000000;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .capability ul {
+            list-style: none;
+            font-size: 0.9em;
+        }
+        
+        .capability li {
+            padding: 6px 0;
+            color: #000000;
+            position: relative;
+            padding-left: 22px;
+        }
+        
+        .capability li:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #000000;
+        }
+        
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .security-item {
+            background: #f9fafb;
+            padding: 25px 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .security-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .security-item .shield {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 15px;
+            stroke: #000000;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .security-item h4 {
+            color: #000000;
+            margin-bottom: 8px;
+            font-size: 1em;
+            font-weight: 600;
+        }
+        
+        .security-item p {
+            color: #000000;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        
+        .cta {
+            background: #f9fafb;
+            color: #000000;
+            padding: 50px 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        
+        .cta h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .cta p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #000000;
+        }
+        
+        .copy-container {
+            background: #f9fafb;
+            color: #000000;
+            padding: 12px 18px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 0 0 1px #e5e7eb;
+        }
+        
+        .copy-container-dark {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: none;
+        }
+        
+        .copy-container-dark:hover {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 0 1px #000000;
+        }
+        
+        .copy-container-light:hover {
+            box-shadow: 0 0 0 1px #000000;
+        }
+        
+        .copy-label {
+            font-size: 0.8em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        
+        .url-text {
+            word-break: break-all;
+        }
+        
+        .copy-button {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85em;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .copy-container-dark .copy-button {
+            background: rgba(255,255,255,0.15);
+            color: #ffffff;
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        .copy-button:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+        
+        .copy-button:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+        
+        .copy-icon {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            fill: none;
+        }
+        
+        .copy-feedback {
+            font-size: 0.8em;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .copy-feedback.show {
+            opacity: 0.9;
+        }
+        
+        .header .copy-container {
+            margin-top: 30px;
+            box-shadow: 0 0 0 1px #e5e7eb;
+        }
+        
+        .architecture-diagram {
+            margin: 30px 0;
+            padding: 30px;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        
+        .diagram-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .diagram-box {
+            padding: 20px;
+            border-radius: 8px;
+            background: #ffffff;
+            min-width: 150px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .diagram-arrow {
+            font-size: 2em;
+            color: #000000;
+        }
+        
+        .intro-collapse {
+            margin-top: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+        
+        .intro-collapse details {
+            cursor: pointer;
+        }
+        
+        .intro-collapse summary {
+            font-weight: 600;
+            font-size: 1em;
+            list-style: none;
+        }
+        
+        .intro-collapse summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .intro-collapse summary::after {
+            content: "+";
+            float: right;
+            font-weight: bold;
+        }
+        
+        .intro-collapse details[open] summary::after {
+            content: "−";
+        }
+        
+        .intro-collapse .intro-content {
+            margin-top: 12px;
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #000000;
+            opacity: 0.85;
+        }
+        
+        .intro-content p {
+            margin-bottom: 12px;
+        }
+        
+        .intro-list {
+            margin: 10px 0 18px 18px;
+            padding-left: 0;
+        }
+        
+        .intro-list li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .intro-collapse ul {
+            margin-top: 10px;
+            padding-left: 18px;
+        }
+        
+        .intro-collapse li {
+            margin-bottom: 6px;
+        }
+        
+        .intro-collapse .cta-link {
+            display: block;
+            margin-top: 20px;
+            font-weight: 600;
+            text-decoration: none;
+            color: #000000;
+        }
+        
+        .rudderstack-arch {
+            margin: 25px 0;
+            padding: 30px;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        
+        .rudderstack-arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .rudderstack-arch-section {
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+        }
+        
+        .rudderstack-arch-section-title {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #000000;
+            opacity: 0.7;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .rudderstack-arch-box {
+            padding: 18px 16px;
+            border-radius: 8px;
+            background: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .rudderstack-arch-box-large {
+            padding: 25px 20px;
+            font-size: 1em;
+        }
+        
+        .rudderstack-arch-box-warehouse {
+            background: #000000;
+            color: #ffffff;
+            padding: 25px 20px;
+        }
+        
+        .rudderstack-arch-box-warehouse .warehouse-detail {
+            font-size: 0.8em;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: 6px;
+        }
+        
+        .rudderstack-arch-arrow {
+            font-size: 1.5em;
+            color: #000000;
+            flex-shrink: 0;
+        }
+        
+        .rudderstack-arch-sources-list, .rudderstack-arch-destinations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .rudderstack-arch-source-item, .rudderstack-arch-destination-item {
+            padding: 12px 14px;
+            border-radius: 6px;
+            background: #ffffff;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 0.85em;
+        }
+        
+        .intro-footnotes {
+            margin-top: 12px;
+            font-size: 0.85em;
+            color: #000000;
+            opacity: 0.6;
+        }
+        
+        .intro-footnotes a {
+            color: inherit;
+            text-decoration: underline;
+        }
+        
+        .intro-collapse .cta-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section-title {
+                font-size: 1.4em;
+            }
+            
+            .setup-steps {
+                flex-direction: column;
+            }
+            
+            .setup-steps::before {
+                display: none;
+            }
+            
+            .diagram-flow {
+                flex-direction: column;
+            }
+            
+            .diagram-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .rudderstack-arch-flow {
+                flex-direction: column;
+            }
+            
+            .rudderstack-arch-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .rudderstack-arch {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <svg class="header-icon" viewBox="0 0 24 24">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                <path d="M2 17L12 22L22 17"/>
+                <path d="M2 12L12 17L22 12"/>
+            </svg>
+            <h1>RudderStack MCP Server</h1>
+            <p>Control Your Data Pipelines from Your AI Client</p>
+            <div class="copy-container copy-container-light" data-copy="https://mcp.rudderstack.com/mcp">
+                <span class="url-text">https://mcp.rudderstack.com/mcp</span>
+                <button class="copy-button" type="button" aria-label="Copy MCP URL">
+                    <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                        <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5"/>
+                    </svg>
+                </button>
+                <span class="copy-feedback" role="status" aria-hidden="true"></span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- What Is It -->
+            <div class="section">
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16V12M12 8H12.01"/>
+                    </svg>
+                    <span>What Is It?</span>
+                </div>
+                <p style="font-size: 1.1em; color: #000000; line-height: 1.8; opacity: 0.8;">
+                    The RudderStack MCP (Model Context Protocol) server connects your AI client (Claude Desktop, Cursor, VS Code) directly to your RudderStack workspace. <strong>Ask questions, debug pipelines, create transformations, and monitor data flows—all through natural language</strong> in your favorite AI tool.
+                </p>
+                
+                <div class="architecture-diagram">
+                    <div class="diagram-flow">
+                        <div class="diagram-box">Your AI Client<br/>(Claude/Cursor)</div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-box">RudderStack MCP Server</div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-box">Your RudderStack<br/>Workspace</div>
+                    </div>
+                </div>
+                
+                <div class="intro-collapse">
+                    <details>
+                        <summary>New to RudderStack? (What the workspace controls)</summary>
+                        <div class="intro-content">
+                            <p>RudderStack is a warehouse-native customer data infrastructure that lets you collect once, store in your own warehouse, and activate everywhere without surrendering control.</p>
+                            <p>Teams lean on RudderStack to:</p>
+                            <ul class="intro-list">
+                                <li><strong>Collect</strong> trustworthy behavioral data via 15+ SDKs and dozens of cloud apps.</li>
+                                <li><strong>Unify</strong> identities and enforce tracking plans before the data hits your stack.</li>
+                                <li><strong>Activate</strong> enriched data through Reverse ETL, personalization, and predictive models.</li>
+                            </ul>
+                            
+                            <div class="rudderstack-arch">
+                                <div class="rudderstack-arch-flow">
+                                    <div class="rudderstack-arch-section">
+                                        <div class="rudderstack-arch-section-title">Sources</div>
+                                        <div class="rudderstack-arch-sources-list">
+                                            <div class="rudderstack-arch-source-item">
+                                                Web SDKs<br/>
+                                                <span style="font-size: 0.75em; font-weight: 400; opacity: 0.7;">JavaScript, AMP, Service Worker</span>
+                                            </div>
+                                            <div class="rudderstack-arch-source-item">
+                                                Mobile SDKs<br/>
+                                                <span style="font-size: 0.75em; font-weight: 400; opacity: 0.7;">iOS, Android, React Native, Flutter</span>
+                                            </div>
+                                            <div class="rudderstack-arch-source-item">
+                                                Server SDKs<br/>
+                                                <span style="font-size: 0.75em; font-weight: 400; opacity: 0.7;">Node, Python, Go, .NET, Rust</span>
+                                            </div>
+                                            <div class="rudderstack-arch-source-item">
+                                                Cloud App Sources<br/>
+                                                <span style="font-size: 0.75em; font-weight: 400; opacity: 0.7;">Shopify, Braze, Iterable, more</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="rudderstack-arch-arrow">→</span>
+                                    <div class="rudderstack-arch-section">
+                                        <div class="rudderstack-arch-section-title">Data Plane</div>
+                                        <div class="rudderstack-arch-box rudderstack-arch-box-large">Event Stream<br/><span style="font-size: 0.8em; font-weight: 400; opacity: 0.7;">Workspace-managed routing & transforms</span></div>
+                                    </div>
+                                    <span class="rudderstack-arch-arrow">→</span>
+                                    <div class="rudderstack-arch-section">
+                                        <div class="rudderstack-arch-section-title">Your Warehouse</div>
+                                        <div class="rudderstack-arch-box rudderstack-arch-box-warehouse">Your Warehouse<br/><span class="warehouse-detail">You own & control all data</span></div>
+                                    </div>
+                                    <span class="rudderstack-arch-arrow">→</span>
+                                    <div class="rudderstack-arch-section">
+                                        <div class="rudderstack-arch-section-title">Destinations</div>
+                                        <div class="rudderstack-arch-destinations-list">
+                                            <div class="rudderstack-arch-destination-item">200+ Cloud Tools</div>
+                                            <div class="rudderstack-arch-destination-item">Analytics & Marketing</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p><strong>Complete data control:</strong> Every event lands in <em>your</em> Snowflake, BigQuery, Databricks, or lakehouse environment. RudderStack never persists customer data; you keep full visibility and governance.</p>
+                            <p><strong>Two-layer architecture:</strong></p>
+                            <ul class="intro-list">
+                                <li><strong>Control Plane (Workspace):</strong> define sources, destinations, transformations, tracking plans, and permissions. This is also where Event Stream configurations live and what the MCP server exposes for AI assistance.</li>
+                                <li><strong>Data Plane:</strong> executes the Event Stream. Run it as <strong>RudderStack Cloud</strong> or self-host the open-source <a href="https://github.com/rudderlabs/rudder-server" target="_blank" rel="noreferrer">rudderlabs/rudder-server</a> so no data ever traverses RudderStack infrastructure.</li>
+                            </ul>
+                        </div>
+                        <a class="cta-link" href="https://www.rudderstack.com/docs/get-started/introduction/" target="_blank" rel="noreferrer">Dive Deeper: Introduction to RudderStack →</a>
+                    </details>
+                </div>
+            </div>
+            
+            <!-- Use Cases -->
+            <div class="section">
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                        <path d="M2 17L12 22L22 17"/>
+                        <path d="M2 12L12 17L22 12"/>
+                    </svg>
+                    <span>Key Use Cases</span>
+                </div>
+                <div class="use-cases">
+                    <div class="use-case-card">
+                        <h3>
+                            <svg class="use-case-icon" viewBox="0 0 24 24">
+                                <path d="M9 11L12 14L22 4"/>
+                                <path d="M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16"/>
+                            </svg>
+                            Pipeline Debugging
+                        </h3>
+                        <div class="use-case-chat">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4H20V16H7L4 20V4Z" fill="none"/>
+                                <path d="M4 4H20V16H7L4 20V4Z" />
+                            </svg>
+                            <span>Need root cause for failing events</span>
+                        </div>
+                        <ul>
+                            <li>Monitor live event flow</li>
+                            <li>Check success rates by source</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h3>
+                            <svg class="use-case-icon" viewBox="0 0 24 24">
+                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"/>
+                                <path d="M14 2V8H20"/>
+                            </svg>
+                            Transformation Dev
+                        </h3>
+                        <div class="use-case-chat">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4H20V16H7L4 20V4Z" fill="none"/>
+                                <path d="M4 4H20V16H7L4 20V4Z" />
+                            </svg>
+                            <span>Mask emails before sending them to the destinations</span>
+                        </div>
+                        <ul>
+                            <li>Test with sample events</li>
+                            <li>Deploy to production</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h3>
+                            <svg class="use-case-icon" viewBox="0 0 24 24">
+                                <path d="M3 3H21V21H3V3Z"/>
+                                <path d="M9 9H15V15H9V9Z"/>
+                            </svg>
+                            Data Quality
+                        </h3>
+                        <div class="use-case-chat">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4H20V16H7L4 20V4Z" fill="none"/>
+                                <path d="M4 4H20V16H7L4 20V4Z" />
+                            </svg>
+                            <span>Audit this week's signup events for duplicate names</span>
+                        </div>
+                        <ul>
+                            <li>Find duplicate event names</li>
+                            <li>Check tracking plan compliance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h3>
+                            <svg class="use-case-icon" viewBox="0 0 24 24">
+                                <path d="M21 16V8C21 7.46957 20.7893 6.96086 20.4142 6.58579C20.0391 6.21071 19.5304 6 19 6H5C4.46957 6 3.96086 6.21071 3.58579 6.58579C3.21071 6.96086 3 7.46957 3 8V16C3 16.5304 3.21071 17.0391 3.58579 17.4142C3.96086 17.7893 4.46957 18 5 18H19C19.5304 18 20.0391 17.7893 20.4142 17.4142C20.7893 17.0391 21 16.5304 21 16Z"/>
+                                <path d="M7 10H17M7 14H17"/>
+                            </svg>
+                            Warehouse Ops
+                        </h3>
+                        <div class="use-case-chat">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4H20V16H7L4 20V4Z" fill="none"/>
+                                <path d="M4 4H20V16H7L4 20V4Z" />
+                            </svg>
+                            <span>Diagnose Mixpanel RETL sync running behind schedule</span>
+                        </div>
+                        <ul>
+                            <li>Check sync status</li>
+                            <li>Troubleshoot failures</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h3>
+                            <svg class="use-case-icon" viewBox="0 0 24 24">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21L16.65 16.65"/>
+                            </svg>
+                            Quick Docs
+                        </h3>
+                        <div class="use-case-chat">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4H20V16H7L4 20V4Z" fill="none"/>
+                                <path d="M4 4H20V16H7L4 20V4Z" />
+                            </svg>
+                            <span>Find setup docs for the Shopify source</span>
+                        </div>
+                        <ul>
+                            <li>Search official docs</li>
+                            <li>Access integration guides</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- How Easy -->
+            <div class="section">
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>
+                    </svg>
+                    <span>How Easy Is It?</span>
+                </div>
+                <div class="setup-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Add to Config</h3>
+                        <p>Add RudderStack MCP to your AI client's configuration file</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Authenticate</h3>
+                        <p>Restart your client and complete the OAuth login flow</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Start Asking</h3>
+                        <p>That's it! Your AI can now access your workspace</p>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <button class="copy-button code-copy-button" type="button" aria-label="Copy JSON config">
+                        <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2"/>
+                            <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5"/>
+                        </svg>
+                    </button>
+                    <span class="copy-feedback" role="status" aria-hidden="true"></span>
+<pre class="code-content" id="json-config">
+{
+  "mcpServers": {
+    "rudderstack": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.rudderstack.com/mcp"]
+    }
+  }
+}
+</pre>
+                </div>
+            </div>
+            
+            <!-- What You Can Do -->
+            <div class="section">
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                        <path d="M2 17L12 22L22 17"/>
+                        <path d="M2 12L12 17L22 12"/>
+                    </svg>
+                    <span>What You Can Do</span>
+                </div>
+                <div class="capabilities">
+                    <div class="capability">
+                        <h4>
+                            <svg class="capability-icon" viewBox="0 0 24 24">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                                <path d="M2 17L12 22L22 17"/>
+                                <path d="M2 12L12 17L22 12"/>
+                            </svg>
+                            Pipeline Config
+                        </h4>
+                        <ul>
+                            <li>List sources & destinations</li>
+                            <li>View configurations</li>
+                            <li>Browse integrations</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="capability">
+                        <h4>
+                            <svg class="capability-icon" viewBox="0 0 24 24">
+                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"/>
+                            </svg>
+                            Transformations
+                        </h4>
+                        <ul>
+                            <li>Create & update</li>
+                            <li>Test & deploy</li>
+                            <li>View metrics</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="capability">
+                        <h4>
+                            <svg class="capability-icon" viewBox="0 0 24 24">
+                                <path d="M3 3H21V21H3V3Z"/>
+                                <path d="M9 9H15V15H9V9Z"/>
+                            </svg>
+                            Event Analysis
+                        </h4>
+                        <ul>
+                            <li>View volumes</li>
+                            <li>Examine schemas</li>
+                            <li>Monitor live events</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="capability">
+                        <h4>
+                            <svg class="capability-icon" viewBox="0 0 24 24">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/>
+                                <path d="M12 6V12L16 14"/>
+                            </svg>
+                            Data Governance
+                        </h4>
+                        <ul>
+                            <li>Tracking plans</li>
+                            <li>Event catalog</li>
+                            <li>Audit logs</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="capability">
+                        <h4>
+                            <svg class="capability-icon" viewBox="0 0 24 24">
+                                <path d="M21 16V8C21 7.46957 20.7893 6.96086 20.4142 6.58579C20.0391 6.21071 19.5304 6 19 6H5C4.46957 6 3.96086 6.21071 3.58579 6.58579C3.21071 6.96086 3 7.46957 3 8V16C3 16.5304 3.21071 17.0391 3.58579 17.4142C3.96086 17.7893 4.46957 18 5 18H19C19.5304 18 20.0391 17.7893 20.4142 17.4142C20.7893 17.0391 21 16.5304 21 16Z"/>
+                            </svg>
+                            Warehouse & RETL
+                        </h4>
+                        <ul>
+                            <li>Sync status</li>
+                            <li>View history</li>
+                            <li>Troubleshoot failures</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security -->
+            <div class="section">
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/>
+                        <path d="M9 12L11 14L15 10"/>
+                    </svg>
+                    <span>Security Built-In</span>
+                </div>
+                <div class="security-features">
+                    <div class="security-item">
+                        <svg class="shield" viewBox="0 0 24 24">
+                            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/>
+                            <path d="M9 12L11 14L15 10"/>
+                        </svg>
+                        <h4>OAuth Authentication</h4>
+                        <p>Same permissions as your account</p>
+                    </div>
+                    
+                    <div class="security-item">
+                        <svg class="shield" viewBox="0 0 24 24">
+                            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/>
+                            <path d="M9 12L11 14L15 10"/>
+                        </svg>
+                        <h4>PII Protection</h4>
+                        <p>Event payloads auto-hashed</p>
+                    </div>
+                    
+                    <div class="security-item">
+                        <svg class="shield" viewBox="0 0 24 24">
+                            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/>
+                            <path d="M9 12L11 14L15 10"/>
+                        </svg>
+                        <h4>Read-Only Default</h4>
+                        <p>Write access limited to transformations</p>
+                    </div>
+                    
+                    <div class="security-item">
+                        <svg class="shield" viewBox="0 0 24 24">
+                            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/>
+                            <path d="M9 12L11 14L15 10"/>
+                        </svg>
+                        <h4>Your Control</h4>
+                        <p>Choose your AI model</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA -->
+            <div class="cta">
+                <h2>Get Started</h2>
+                <p><strong>Prerequisites:</strong> RudderStack workspace + MCP-compatible AI client</p>
+                <p>(Claude Desktop, Cursor, VS Code, etc.)</p>
+                <div class="copy-container copy-container-dark" data-copy="https://mcp.rudderstack.com/mcp">
+                    <span class="url-text">https://mcp.rudderstack.com/mcp</span>
+                    <button class="copy-button" type="button" aria-label="Copy MCP URL">
+                        <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2"/>
+                            <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5"/>
+                        </svg>
+                    </button>
+                    <span class="copy-feedback" role="status" aria-hidden="true"></span>
+                </div>
+                <p style="margin-top: 25px; font-size: 1em; opacity: 0.7;">
+                    <em>Transform how you work with data pipelines. Instead of switching between UIs—just ask your AI.</em>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            function toggleFeedback(feedback, message, duration = 1800) {
+                if (!feedback) return;
+                feedback.textContent = message;
+                feedback.classList.add('show');
+                feedback.setAttribute('aria-hidden', 'false');
+                setTimeout(() => {
+                    feedback.textContent = '';
+                    feedback.classList.remove('show');
+                    feedback.setAttribute('aria-hidden', 'true');
+                }, duration);
+            }
+            
+            function setupCopyInteraction(container, resolver) {
+                const button = container.querySelector('.copy-button');
+                if (!button) return;
+                const feedback = container.querySelector('.copy-feedback');
+                const resolveText = typeof resolver === 'function'
+                    ? resolver
+                    : (el) => el.dataset.copy || el.innerText.trim();
+                
+                button.addEventListener('click', async () => {
+                    const textToCopy = resolveText(container);
+                    if (!textToCopy) return;
+                    
+                    try {
+                        await navigator.clipboard.writeText(textToCopy);
+                        toggleFeedback(feedback, 'Copied!');
+                    } catch (error) {
+                        toggleFeedback(feedback, 'Copy failed', 2000);
+                    }
+                });
+            }
+            
+            document.querySelectorAll('.copy-container').forEach((container) => {
+                setupCopyInteraction(container);
+            });
+            
+            document.querySelectorAll('.code-block').forEach((block) => {
+                if (!block.querySelector('.code-copy-button')) return;
+                setupCopyInteraction(block, (el) => {
+                    const target = el.querySelector('.code-content');
+                    return target ? target.innerText.trim() : el.innerText.trim();
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
